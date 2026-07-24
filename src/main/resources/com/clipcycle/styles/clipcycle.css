@@ -1,0 +1,23 @@
+/*
+ * ClipCycle Design System
+ * -----------------------
+ * Filmstrip metaphor: dark reel background, amber-lit active frame.
+ * This file defines the colour palette as CSS variables and the base
+ * styles for the application window.  Component styles will be added
+ * in later tasks.
+ */
+
+/* ── Palette ─────────────────────────────────────────────────────── */
+.root {
+    -bg-base:           #14171C;
+    -frame-idle:        #262B33;
+    -frame-active-glow: #E8A33D;
+    -slate:             #4A5568;
+    -text-primary:      #EDEDE3;
+    -text-muted:        #8A8F98;
+}
+
+/* ── Base window ─────────────────────────────────────────────────── */
+.root-pane {
+    -fx-background-color: -bg-base;
+}
