@@ -1,42 +1,147 @@
-# ClipCycle
+<div align="center">
 
-A filmstrip-style clipboard manager built for the PDSA (Data Structures &
-Algorithms) coursework.  The core data structure is a **hand-written Doubly
-Linked List** — no `java.util.LinkedList` or other built-in linked structures
-are used.
+# 🎞️ ClipCycle
 
-## Prerequisites
+**A Filmstrip-Inspired Desktop Clipboard Manager & Data Structures Demonstration**
 
-| Tool  | Version |
-|-------|---------|
-| JDK   | 17+     |
-| Maven | 3.8+    |
+![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![JavaFX](https://img.shields.io/badge/JavaFX-17.0.13-FF4081?style=for-the-badge&logo=openjfx&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-3.8%2B-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
+![JUnit5](https://img.shields.io/badge/JUnit-5.10-25A162?style=for-the-badge&logo=junit5&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue.style=for-the-badge)
 
-## Quick start
+</div>
+
+---
+
+## 📌 Project Overview
+
+**ClipCycle** is a specialized desktop clipboard manager built for a university **Data Structures and Algorithms (PDSA)** coursework project.
+
+It organizes related text items into an ordered sequence called a **Copy List**. Users can step forward and backward through the sequence, automatically syncing the active item to the system clipboard, inserting new items anywhere in the sequence, or deleting unwanted items seamlessly.
+
+---
+
+## 💡 Visual Metaphor & Design System
+
+Rather than generic administrative dashboards, **ClipCycle** adopts a physical **filmstrip metaphor**:
+
+- **Filmstrip Reel (`#14171C`)**: Dark background representing a film reel container.
+- **Frames (`#262B33`)**: Each clipboard item sits in a distinct frame complete with sprocket hole perforations.
+- **Active Frame Glow (`#E8A33D`)**: The active node lights up in warm amber, while inactive frames remain dimmed.
+- **Projector Advances**: Navigating Next/Previous slides the sequence into view.
+
+### 🎨 Color Palette
+
+| Swatch | Variable Name | Hex Code | Role |
+| :---: | :--- | :--- | :--- |
+| ⬛ | `--bg-base` | `#14171C` | Deep reel background |
+| 🔲 | `--frame-idle` | `#262B33` | Inactive item frame |
+| 🟧 | `--frame-active-glow` | `#E8A33D` | Active item highlight |
+| 🩶 | `--slate` | `#4A5568` | Borders & secondary controls |
+| ⚪ | `--text-primary` | `#EDEDE3` | Primary item content |
+| 🔘 | `--text-muted` | `#8A8F98` | Sequence index & captions |
+
+---
+
+## ⚙️ Hard Technical Constraint: Hand-Written Doubly Linked List
+
+To meet strict academic requirements, **no built-in linked structures** (such as `java.util.LinkedList` or `ArrayDeque`) are used. The core Copy List is implemented from scratch using pointers.
+
+### 🧠 Data Structure Architecture
+
+```
+         [Head]                                                       [Tail]
+           │                                                            │
+           ▼                                                            ▼
+      ┌─────────┐      ┌─────────┐      ┌─────────┐      ┌─────────┐
+NULL ◄┤ Node 1  ├─────►│ Node 2  ├─────►│ Node 3  ├─────►│ Node 4  ├► NULL
+      │(index 1)│◄─────┤(index 2)│◄─────┤(index 3)│◄─────┤(index 4)│
+      └─────────┘      └────┬────┘      └─────────┘      └─────────┘
+                            ▲
+                            │
+                        [Current]
+```
+
+### Core Operations & Complexity
+
+| Operation | Description | Time Complexity | Pointer Adjustments |
+| :--- | :--- | :---: | :--- |
+| `addItem(text)` | Appends node to the tail of the list | $\mathcal{O}(1)$ | Updates `tail.next` & new node `prev` |
+| `insertAfterCurrent(text)` | Inserts node immediately after active item | $\mathcal{O}(1)$ | Re-links 4 pointers (`current`, `newNode`, `next`) |
+| `deleteItem()` | Removes active node and reconnects neighbors | $\mathcal{O}(1)$ | Updates `prev.next` & `next.prev`, advances `current` |
+| `next()` / `previous()` | Moves active frame forward or backward | $\mathcal{O}(1)$ | Shifts `current = current.next` or `current.prev` |
+| `copyCurrent()` | Copies active node text to OS system clipboard | $\mathcal{O}(1)$ | Reads `current.content` and writes to OS clipboard |
+
+---
+
+## 📁 Package Architecture
+
+```
+clipvault/
+├── pom.xml                                  # Maven project descriptor & dependencies
+├── LICENSE                                  # MIT open-source license
+├── README.md                                # Project documentation
+└── src/
+    ├── main/
+    │   ├── java/
+    │   │   ├── module-info.java             # JavaFX module descriptor
+    │   │   └── com/clipcycle/
+    │   │       ├── App.java                 # Main JavaFX application entry point
+    │   │       ├── model/                   # Hand-written DoublyLinkedList & ClipboardNode
+    │   │       └── controller/              # JavaFX UI Controllers (No direct pointer logic)
+    │   └── resources/
+    │       └── com/clipcycle/styles/
+    │           └── clipcycle.css            # Filmstrip design system stylesheet
+    └── test/
+        └── java/com/clipcycle/model/        # JUnit 5 unit tests for data structure correctness
+```
+
+---
+
+## 🚀 Quick Start & Running Locally
+
+### Prerequisites
+
+- **Java Development Kit (JDK)**: Version 17 or higher
+- **Apache Maven**: Version 3.8+
+
+### Environment Setup
+
+Ensure `JAVA_HOME` points to JDK 17+:
+```bash
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home
+```
+
+### Build & Execution Commands
 
 ```bash
-# Compile and launch the JavaFX window
-mvn clean javafx:run
+# 1. Clone the repository
+git clone https://github.com/mr-kumuditha/clipvault.git
+cd clipvault
 
-# Run the data-structure unit tests
+# 2. Compile the project
+mvn clean compile
+
+# 3. Launch the JavaFX desktop application
+mvn javafx:run
+
+# 4. Run data structure unit tests
 mvn test
 ```
 
-## Package layout
+---
 
-```
-src/main/java/com/clipcycle/
-├── App.java              ← JavaFX entry point
-├── model/                ← ClipboardNode, DoublyLinkedList (hand-written)
-└── controller/           ← FXML controllers (call model, never touch pointers)
+## 🧪 Unit Testing
 
-src/main/resources/com/clipcycle/
-└── styles/clipcycle.css  ← filmstrip design-system stylesheet
+The data structure logic is covered by isolated **JUnit 5 unit tests** located in `src/test/java/com/clipcycle/model/`. Run all tests using:
 
-src/test/java/com/clipcycle/
-└── model/                ← JUnit 5 tests for the linked-list logic
+```bash
+mvn test
 ```
 
-## Licence
+---
 
-University coursework — not for redistribution.
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
