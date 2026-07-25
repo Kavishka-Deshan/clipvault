@@ -6,4 +6,6 @@ module com.clipcycle {
     opens com.clipcycle to javafx.fxml;
 
     exports com.clipcycle;
+    exports com.clipcycle.model;
 }
+
