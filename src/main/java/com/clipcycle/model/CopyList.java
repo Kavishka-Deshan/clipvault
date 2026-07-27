@@ -1,5 +1,8 @@
 package com.clipcycle.model;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+
 /**
  * A hand-written Doubly Linked List that manages an ordered sequence
  * of {@link ClipboardNode}s — the "Copy List."
@@ -290,6 +293,37 @@ public class CopyList {
 
         size--;
         return deletedContent;
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    //  copyCurrent — write the active node's text to the OS clipboard
+    // ════════════════════════════════════════════════════════════════
+
+    /**
+     * Copies the current node's text content to the real system
+     * clipboard using java.awt, which writes to the same OS clipboard
+     * that JavaFX (and every other application) reads from.
+     *
+     * <p><b>Pointer change:</b> none — this is a read-only operation
+     * on the list structure.  Only the OS clipboard state changes.
+     *
+     * @return {@code true} if text was successfully written to the
+     *         clipboard; {@code false} if the list is empty
+     *         (current == null) and there was nothing to copy
+     */
+    public boolean copyCurrent() {
+        if (current == null) {
+            return false;  // nothing to copy
+        }
+        // Wrap the text in a StringSelection (a Transferable) and
+        // hand it to the system clipboard.  The second argument
+        // (ClipboardOwner) is null because we don't need notification
+        // when another app overwrites the clipboard.
+        StringSelection selection = new StringSelection(current.getContent());
+        Toolkit.getDefaultToolkit()
+               .getSystemClipboard()
+               .setContents(selection, null);
+        return true;
     }
 
     // ════════════════════════════════════════════════════════════════
