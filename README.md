@@ -8,7 +8,7 @@
 ![JavaFX](https://img.shields.io/badge/JavaFX-17.0.13-FF4081?style=for-the-badge&logo=openjfx&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-3.8%2B-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
 ![JUnit5](https://img.shields.io/badge/JUnit-5.10-25A162?style=for-the-badge&logo=junit5&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-blue.style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
 </div>
 
@@ -26,10 +26,10 @@ It organizes related text items into an ordered sequence called a **Copy List**.
 
 Rather than generic administrative dashboards, **ClipCycle** adopts a physical **filmstrip metaphor**:
 
-- **Filmstrip Reel (`#14171C`)**: Dark background representing a film reel container.
+- **Filmstrip Reel (`#14171C`)**: Dark background representing a physical film reel container.
 - **Frames (`#262B33`)**: Each clipboard item sits in a distinct frame complete with sprocket hole perforations.
 - **Active Frame Glow (`#E8A33D`)**: The active node lights up in warm amber, while inactive frames remain dimmed.
-- **Projector Advances**: Navigating Next/Previous slides the sequence into view.
+- **Projector Advances**: Navigating Next/Previous slides the sequence smoothly into view.
 
 ### 🎨 Color Palette
 
@@ -40,13 +40,13 @@ Rather than generic administrative dashboards, **ClipCycle** adopts a physical *
 | 🟧 | `--frame-active-glow` | `#E8A33D` | Active item highlight |
 | 🩶 | `--slate` | `#4A5568` | Borders & secondary controls |
 | ⚪ | `--text-primary` | `#EDEDE3` | Primary item content |
-| 🔘 | `--text-muted` | `#8A8F98` | Sequence index & captions |
+| 🔘 | `--text-muted` | `--8A8F98` | Sequence index & captions |
 
 ---
 
 ## ⚙️ Hard Technical Constraint: Hand-Written Doubly Linked List
 
-To meet strict academic requirements, **no built-in linked structures** (such as `java.util.LinkedList` or `ArrayDeque`) are used. The core Copy List is implemented from scratch using pointers.
+To meet strict academic requirements, **no built-in linked structures** (such as `java.util.LinkedList` or `ArrayDeque`) are used. The core Copy List is implemented entirely from scratch using pointers (`head`, `tail`, `current`, `prev`, `next`).
 
 ### 🧠 Data Structure Architecture
 
@@ -63,15 +63,27 @@ NULL ◄┤ Node 1  ├─────►│ Node 2  ├─────►│ No
                         [Current]
 ```
 
-### Core Operations & Complexity
+### Core Operations & Oral Exam Guide
 
 | Operation | Description | Time Complexity | Pointer Adjustments |
 | :--- | :--- | :---: | :--- |
-| `addItem(text)` | Appends node to the tail of the list | $\mathcal{O}(1)$ | Updates `tail.next` & new node `prev` |
-| `insertAfterCurrent(text)` | Inserts node immediately after active item | $\mathcal{O}(1)$ | Re-links 4 pointers (`current`, `newNode`, `next`) |
+| `addItem(text)` | Appends node to the tail of the list | $\mathcal{O}(1)$ | Updates `tail.next` & new node `prev`, advances `tail` |
+| `insertAfterCurrent(text)` | Inserts node immediately after active item | $\mathcal{O}(1)$ | Re-links 4 pointers (`current`, `newNode`, `successor`) |
 | `deleteItem()` | Removes active node and reconnects neighbors | $\mathcal{O}(1)$ | Updates `prev.next` & `next.prev`, advances `current` |
 | `next()` / `previous()` | Moves active frame forward or backward | $\mathcal{O}(1)$ | Shifts `current = current.next` or `current.prev` |
 | `copyCurrent()` | Copies active node text to OS system clipboard | $\mathcal{O}(1)$ | Reads `current.content` and writes to OS clipboard |
+| `start()` | Resets active pointer to the head of the list | $\mathcal{O}(1)$ | Sets `current = head` |
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+| :--- | :--- |
+| `←` (Left Arrow) | Navigate to Previous item |
+| `→` (Right Arrow) | Navigate to Next item |
+| `Cmd + N` / `Ctrl + N` | Add New Item dialog |
+| `Tab` / `Shift + Tab` | Focus cycle through interactive controls |
 
 ---
 
@@ -89,12 +101,12 @@ clipvault/
     │   │   └── com/clipcycle/
     │   │       ├── App.java                 # Main JavaFX application entry point
     │   │       ├── model/                   # Hand-written DoublyLinkedList & ClipboardNode
-    │   │       └── controller/              # JavaFX UI Controllers (No direct pointer logic)
+    │   │       └── controller/              # JavaFX UI Controller (MainController)
     │   └── resources/
     │       └── com/clipcycle/styles/
     │           └── clipcycle.css            # Filmstrip design system stylesheet
     └── test/
-        └── java/com/clipcycle/model/        # JUnit 5 unit tests for data structure correctness
+        └── java/com/clipcycle/model/        # JUnit 5 unit tests for data structure correctness (27 tests)
 ```
 
 ---
@@ -110,7 +122,7 @@ clipvault/
 
 Ensure `JAVA_HOME` points to JDK 17+:
 ```bash
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home
+export JAVA_HOME=$(/usr/libexec/java_home)
 ```
 
 ### Build & Execution Commands
@@ -134,11 +146,13 @@ mvn test
 
 ## 🧪 Unit Testing
 
-The data structure logic is covered by isolated **JUnit 5 unit tests** located in `src/test/java/com/clipcycle/model/`. Run all tests using:
+The data structure logic is covered by 27 isolated **JUnit 5 unit tests** located in `src/test/java/com/clipcycle/model/CopyListTest.java`.
 
 ```bash
 mvn test
 ```
+
+All 27 test cases pass with 0 failures, validating edge cases such as empty-list handling, single-item deletion, head/tail deletion, and pointer integrity.
 
 ---
 
