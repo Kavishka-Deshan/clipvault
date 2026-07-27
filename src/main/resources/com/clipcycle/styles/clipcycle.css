@@ -1,23 +1,406 @@
 /*
- * ClipCycle Design System
- * -----------------------
- * Filmstrip metaphor: dark reel background, amber-lit active frame.
- * This file defines the colour palette as CSS variables and the base
- * styles for the application window.  Component styles will be added
- * in later tasks.
+ * ClipCycle — Filmstrip Design System
+ * ──────────────────────────────────────────────────────────
+ *
+ * Palette (JavaFX looked-up colours, defined on .root):
+ *   -bg-base            #14171C   near-black, the "reel"
+ *   -frame-idle          #262B33   inactive frame background
+ *   -frame-active-glow   #E8A33D   warm amber, active frame
+ *   -slate               #4A5568   borders, secondary UI
+ *   -text-primary        #EDEDE3   warm off-white
+ *   -text-muted          #8A8F98   captions, secondary text
+ *   -strip-bg            #1A1E25   film stock background
+ *
+ * Typography split:
+ *   Mono  → frame numbers, positions, buttons, technical labels
+ *   Sans  → item text content inside frames
  */
 
-/* ── Palette ─────────────────────────────────────────────────────── */
+
+/* ═══════════════════════════════════════════════════════════
+   ROOT  &  PALETTE
+   ═══════════════════════════════════════════════════════════ */
+
 .root {
-    -bg-base:           #14171C;
-    -frame-idle:        #262B33;
-    -frame-active-glow: #E8A33D;
-    -slate:             #4A5568;
-    -text-primary:      #EDEDE3;
-    -text-muted:        #8A8F98;
+    -bg-base:            #14171C;
+    -frame-idle:         #262B33;
+    -frame-active-glow:  #E8A33D;
+    -slate:              #4A5568;
+    -text-primary:       #EDEDE3;
+    -text-muted:         #8A8F98;
+    -strip-bg:           #1A1E25;
+
+    /* Default body font — humanist sans-serif for content text */
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue";
+    -fx-font-size: 13;
+
+    /* Defined focus color palette */
+    -fx-focus-color: -frame-active-glow;
+    -fx-faint-focus-color: derive(-frame-active-glow, -80%);
 }
 
-/* ── Base window ─────────────────────────────────────────────────── */
 .root-pane {
     -fx-background-color: -bg-base;
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   HEADER BAR
+   ═══════════════════════════════════════════════════════════ */
+
+.header-bar {
+    -fx-padding: 18 28 14 28;
+    -fx-border-color: transparent transparent derive(-slate, -40%) transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.app-title {
+    -fx-font-family: "JetBrains Mono", "Menlo", "Consolas";
+    -fx-font-size: 15;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+.list-name-label {
+    -fx-font-size: 12;
+    -fx-text-fill: -text-muted;
+    -fx-padding: 2 0 0 1;
+}
+
+.position-label {
+    -fx-font-family: "JetBrains Mono", "Menlo", "Consolas";
+    -fx-font-size: 12;
+    -fx-text-fill: -text-muted;
+}
+
+.status-label {
+    -fx-font-family: "JetBrains Mono", "Menlo", "Consolas";
+    -fx-font-size: 11;
+    -fx-text-fill: -frame-active-glow;
+    -fx-padding: 2 0 0 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   FILMSTRIP  —  SCROLL PANE  &  STRIP
+   ═══════════════════════════════════════════════════════════ */
+
+.filmstrip-scroll {
+    -fx-background-color: -strip-bg;
+    -fx-background: -strip-bg;
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+.filmstrip-scroll > .viewport {
+    -fx-background-color: -strip-bg;
+}
+
+/* ── Minimal dark scrollbar ────────────────────────── */
+
+.filmstrip-scroll .scroll-bar:horizontal {
+    -fx-background-color: derive(-strip-bg, 3%);
+    -fx-pref-height: 8;
+    -fx-padding: 0;
+}
+
+.filmstrip-scroll .scroll-bar:horizontal .track {
+    -fx-background-color: derive(-strip-bg, 5%);
+    -fx-background-radius: 4;
+}
+
+.filmstrip-scroll .scroll-bar:horizontal .thumb {
+    -fx-background-color: -slate;
+    -fx-background-radius: 4;
+}
+
+.filmstrip-scroll .scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: derive(-slate, 15%);
+}
+
+/* Hide the arrow buttons for a cleaner look */
+.filmstrip-scroll .scroll-bar .increment-button,
+.filmstrip-scroll .scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+    -fx-min-height: 0;
+    -fx-min-width: 0;
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.filmstrip-scroll .scroll-bar .increment-arrow,
+.filmstrip-scroll .scroll-bar .decrement-arrow {
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+    -fx-padding: 0;
+    -fx-shape: "";
+}
+
+/* The continuous horizontal film-stock band */
+.filmstrip-strip {
+    -fx-background-color: -strip-bg;
+    -fx-padding: 20 40;
+    -fx-spacing: 4;
+    -fx-alignment: center;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   FRAME CELLS
+   ═══════════════════════════════════════════════════════════ */
+
+.frame-cell {
+    -fx-alignment: top-center;
+    -fx-min-width: 160;
+    -fx-pref-width: 160;
+    -fx-cursor: hand;
+}
+
+/* ── Sprocket holes — dark rectangles punched through the stock ── */
+
+.sprocket-row {
+    -fx-padding: 6 16;
+    -fx-spacing: 12;
+    -fx-alignment: center;
+}
+
+.sprocket-hole {
+    -fx-background-color: -bg-base;
+    -fx-background-radius: 2;
+    -fx-min-width: 18;
+    -fx-min-height: 8;
+    -fx-pref-width: 18;
+    -fx-pref-height: 8;
+}
+
+/* Index number sits between sprocket holes — it doubles as
+   the structural perforation label (spec requirement). */
+.frame-index {
+    -fx-font-family: "JetBrains Mono", "Menlo", "Consolas";
+    -fx-font-size: 10;
+    -fx-text-fill: -text-muted;
+    -fx-padding: 0 4;
+}
+
+.frame-cell-active .frame-index {
+    -fx-text-fill: -frame-active-glow;
+}
+
+/* ── Frame body — the content rectangle ── */
+
+.frame-body {
+    -fx-background-color: -frame-idle;
+    -fx-background-radius: 3;
+    -fx-padding: 12 14 16 14;
+    -fx-alignment: center;
+    -fx-min-height: 100;
+    -fx-pref-height: 110;
+}
+
+.frame-cell:hover .frame-body {
+    -fx-background-color: derive(-frame-idle, 8%);
+}
+
+/* Active frame — amber border + glow (one accent, all the work) */
+.frame-cell-active .frame-body {
+    -fx-border-color: -frame-active-glow;
+    -fx-border-width: 2;
+    -fx-border-radius: 3;
+    -fx-effect: dropshadow(gaussian, -frame-active-glow, 18, 0.25, 0, 0);
+}
+
+/* Content text inside the frame */
+.frame-content {
+    -fx-font-size: 13;
+    -fx-text-fill: -text-primary;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+    -fx-max-width: 130;
+}
+
+/* ── Empty-state placeholder ── */
+
+.empty-label {
+    -fx-font-family: "JetBrains Mono", "Menlo", "Consolas";
+    -fx-font-size: 13;
+    -fx-text-fill: -text-muted;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   CONTROL BAR
+   ═══════════════════════════════════════════════════════════ */
+
+.control-bar {
+    -fx-background-color: derive(-bg-base, 3%);
+    -fx-padding: 18 28 22 28;
+    -fx-spacing: 12;
+    -fx-alignment: center;
+    -fx-border-color: derive(-slate, -40%) transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.primary-controls {
+    -fx-spacing: 14;
+    -fx-alignment: center;
+}
+
+.secondary-controls {
+    -fx-spacing: 10;
+    -fx-alignment: center;
+}
+
+/* ── Primary buttons  (Previous / Copy Current / Next) ────── */
+
+.primary-btn {
+    -fx-background-color: -frame-idle;
+    -fx-text-fill: -text-primary;
+    -fx-font-family: "JetBrains Mono", "Menlo", "Consolas";
+    -fx-font-size: 13;
+    -fx-padding: 10 28;
+    -fx-background-radius: 6;
+    -fx-border-color: -slate;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+}
+
+.primary-btn:hover {
+    -fx-background-color: derive(-frame-idle, 12%);
+    -fx-border-color: derive(-slate, 20%);
+}
+
+.primary-btn:pressed {
+    -fx-background-color: derive(-frame-idle, -8%);
+}
+
+/* Copy Current — amber accent, the visual centrepiece */
+.copy-btn {
+    -fx-background-color: -frame-active-glow;
+    -fx-text-fill: -bg-base;
+    -fx-font-weight: bold;
+    -fx-padding: 10 34;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, -frame-active-glow, 8, 0.15, 0, 0);
+}
+
+.copy-btn:hover {
+    -fx-background-color: derive(-frame-active-glow, 10%);
+    -fx-effect: dropshadow(gaussian, -frame-active-glow, 12, 0.2, 0, 0);
+}
+
+.copy-btn:pressed {
+    -fx-background-color: derive(-frame-active-glow, -12%);
+    -fx-effect: dropshadow(gaussian, -frame-active-glow, 4, 0.1, 0, 0);
+}
+
+.primary-btn:focused {
+    -fx-border-color: -frame-active-glow;
+    -fx-border-width: 1.5;
+}
+
+.copy-btn:focused {
+    -fx-border-color: -text-primary;
+    -fx-border-width: 2;
+}
+
+/* ── Secondary buttons  (Add / Insert After / Delete) ────── */
+
+.secondary-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-muted;
+    -fx-font-family: "JetBrains Mono", "Menlo", "Consolas";
+    -fx-font-size: 11;
+    -fx-padding: 7 18;
+    -fx-background-radius: 4;
+    -fx-border-color: derive(-slate, -20%);
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-cursor: hand;
+}
+
+.secondary-btn:hover {
+    -fx-background-color: derive(-frame-idle, 5%);
+    -fx-text-fill: -text-primary;
+    -fx-border-color: -slate;
+}
+
+.secondary-btn:focused {
+    -fx-border-color: -frame-active-glow;
+    -fx-text-fill: -text-primary;
+}
+
+.secondary-btn:pressed {
+    -fx-background-color: derive(-frame-idle, -5%);
+}
+
+/* Delete — subtle danger tint on hover only */
+.delete-btn:hover {
+    -fx-border-color: #C0392B;
+    -fx-text-fill: #E74C3C;
+    -fx-background-color: derive(#C0392B, -70%);
+}
+
+.delete-btn:focused {
+    -fx-border-color: #E74C3C;
+    -fx-text-fill: #E74C3C;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DIALOGS & INPUT FIELDS
+   ═══════════════════════════════════════════════════════════ */
+
+.dialog-pane {
+    -fx-background-color: -bg-base;
+}
+
+.dialog-pane > .header-panel {
+    -fx-background-color: derive(-bg-base, 5%);
+}
+
+.dialog-pane > .content {
+    -fx-text-fill: -text-primary;
+}
+
+.dialog-pane .label {
+    -fx-text-fill: -text-primary;
+}
+
+.dialog-pane .text-field {
+    -fx-background-color: -frame-idle;
+    -fx-text-fill: -text-primary;
+    -fx-highlight-fill: -frame-active-glow;
+    -fx-highlight-text-fill: -bg-base;
+    -fx-border-color: -slate;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8;
+    -fx-font-family: "JetBrains Mono", "Menlo", "Consolas";
+}
+
+.dialog-pane .text-field:focused {
+    -fx-border-color: -frame-active-glow;
+}
+
+.dialog-pane .button {
+    -fx-background-color: -frame-idle;
+    -fx-text-fill: -text-primary;
+    -fx-font-family: "JetBrains Mono", "Menlo", "Consolas";
+    -fx-border-color: -slate;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: derive(-frame-idle, 15%);
+}
+
+.dialog-pane .button:default {
+    -fx-background-color: -frame-active-glow;
+    -fx-text-fill: -bg-base;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+}
+
